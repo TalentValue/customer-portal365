@@ -12,6 +12,7 @@ server/dist/
 .env
 server/.env
 *.env.local
+# .env.example is committed on purpose
 
 # Prisma generated client
 server/node_modules/.prisma/
