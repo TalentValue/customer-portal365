@@ -1,0 +1,8 @@
+{$DOMAIN} {
+    # API and WebSocket — forward to Node server
+    reverse_proxy /api/* server:3001
+    reverse_proxy /socket.io/* server:3001
+
+    # Everything else — serve from the React nginx container
+    reverse_proxy * client:80
+}
