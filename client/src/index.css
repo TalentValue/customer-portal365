@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 33% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -12,16 +12,16 @@
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 239 84% 67%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+    --secondary: 230 30% 96%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
+    --muted: 230 30% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    --accent: 230 30% 94%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 230 35% 91%;
+    --input: 230 35% 91%;
     --ring: 239 84% 67%;
     --radius: 0.5rem;
   }
@@ -51,7 +51,8 @@
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
+  html { font-size: 16px; }
+  body { @apply bg-background text-foreground; font-size: 1rem; }
 }
 
 /* Scrollbar styling */
@@ -59,3 +60,30 @@
 ::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
 ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground; }
+
+/* AI landing page animations */
+@keyframes aurora {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-20px); }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(1.15); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-aurora      { animation: aurora 8s ease infinite; background-size: 400% 400%; }
+.animate-float       { animation: float 6s ease-in-out infinite; }
+.animate-glow        { animation: glow-pulse 3s ease-in-out infinite; }
+.animate-shimmer     { animation: shimmer 3s linear infinite; background-size: 200% auto; }
+.animate-rotate-slow { animation: rotate-slow 20s linear infinite; }

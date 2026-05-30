@@ -42,7 +42,7 @@ export function KanbanColumn({ id, label, tickets, droppable = true }: Props) {
       <div className="flex items-center justify-between px-3 py-3 border-b">
         <span className="text-sm font-semibold">{label}</span>
         <div className="flex items-center gap-1.5">
-          {!droppable && <span className="text-[10px] text-muted-foreground italic">auto-set</span>}
+          {!droppable && <span className="text-base text-muted-foreground italic">auto-set</span>}
           <span className="text-xs text-muted-foreground bg-muted rounded-full px-2 py-0.5">{tickets.length}</span>
         </div>
       </div>

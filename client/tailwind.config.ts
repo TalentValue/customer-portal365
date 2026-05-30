@@ -16,6 +16,10 @@ const config: Config = {
       screens: { '2xl': '1400px' },
     },
     extend: {
+      fontSize: {
+        xs: ['1rem', { lineHeight: '1.5' }],
+        sm: ['1rem', { lineHeight: '1.5' }],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

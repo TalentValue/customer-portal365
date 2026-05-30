@@ -9,6 +9,9 @@ import { AuthLayout } from '@/layouts/AuthLayout'
 import { AdminLayout } from '@/layouts/AdminLayout'
 import { ClientLayout } from '@/layouts/ClientLayout'
 
+// Landing page
+import Landing from '@/pages/Landing'
+
 // Auth pages
 import Login from '@/pages/auth/Login'
 import AcceptInvite from '@/pages/auth/AcceptInvite'
@@ -85,8 +88,8 @@ export default function App() {
           <Route path="profile" element={<ClientProfile />} />
         </Route>
 
-        {/* Root redirect */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Landing + catch-all */}
+        <Route path="/" element={<Landing />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
       <Toaster />

@@ -13,7 +13,7 @@ interface UIState {
 export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
-      theme: 'system',
+      theme: 'light',
       sidebarCollapsed: false,
       setTheme: (theme) => {
         set({ theme })

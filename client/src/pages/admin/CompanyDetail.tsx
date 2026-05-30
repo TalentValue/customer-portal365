@@ -221,7 +221,7 @@ export default function CompanyDetail() {
               <UserCheck className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-muted-foreground">Account manager:</span>
               <Avatar className="h-5 w-5">
-                <AvatarFallback className="text-[10px]">
+                <AvatarFallback className="text-base">
                   {company.accountManager.firstName[0]}{company.accountManager.lastName[0]}
                 </AvatarFallback>
               </Avatar>
@@ -396,7 +396,7 @@ export default function CompanyDetail() {
                   <div className="flex flex-col items-center">
                     <Avatar className="h-7 w-7 shrink-0">
                       {log.user?.avatarUrl && <AvatarImage src={log.user.avatarUrl} />}
-                      <AvatarFallback className="text-[10px]">
+                      <AvatarFallback className="text-base">
                         {log.user ? `${log.user.firstName[0]}${log.user.lastName[0]}` : '?'}
                       </AvatarFallback>
                     </Avatar>

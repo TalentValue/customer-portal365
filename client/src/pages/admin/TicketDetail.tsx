@@ -505,7 +505,7 @@ export default function TicketDetail() {
                   <div className="flex items-center gap-1 flex-wrap">
                     {(ticket.watchers ?? []).map((w: any) => (
                       <Avatar key={w.userId} className="h-6 w-6" title={`${w.user.firstName} ${w.user.lastName}`}>
-                        <AvatarFallback className="text-[10px]">{w.user.firstName[0]}{w.user.lastName[0]}</AvatarFallback>
+                        <AvatarFallback className="text-base">{w.user.firstName[0]}{w.user.lastName[0]}</AvatarFallback>
                       </Avatar>
                     ))}
                   </div>

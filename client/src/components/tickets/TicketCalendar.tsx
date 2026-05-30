@@ -41,12 +41,12 @@ export function TicketCalendar({ tickets }: TicketCalendarProps) {
     <div className="calendar-wrapper" style={{ height: 600 }}>
       <style>{`
         .rbc-calendar { font-family: inherit; color: inherit; background: transparent; }
-        .rbc-header { padding: 6px; font-weight: 500; font-size: 0.75rem; border-color: hsl(var(--border)); }
+        .rbc-header { padding: 6px; font-weight: 500; font-size: 1rem; border-color: hsl(var(--border)); }
         .rbc-month-view, .rbc-agenda-view, .rbc-time-view { border-color: hsl(var(--border)); }
         .rbc-day-bg + .rbc-day-bg, .rbc-month-row + .rbc-month-row { border-color: hsl(var(--border)); }
         .rbc-off-range-bg { background: hsl(var(--muted) / 0.5); }
         .rbc-today { background: hsl(var(--primary) / 0.05); }
-        .rbc-toolbar button { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; border-color: hsl(var(--border)); color: hsl(var(--foreground)); background: transparent; }
+        .rbc-toolbar button { font-size: 1rem; padding: 4px 10px; border-radius: 6px; border-color: hsl(var(--border)); color: hsl(var(--foreground)); background: transparent; }
         .rbc-toolbar button:hover { background: hsl(var(--accent)); }
         .rbc-toolbar button.rbc-active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
         .rbc-event { border-radius: 4px; font-size: 0.7rem; padding: 1px 4px; }

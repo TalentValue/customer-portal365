@@ -105,7 +105,7 @@ export function TicketTimeline({ tickets }: { tickets: Ticket[] }) {
                     onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
                     title={`${ticket.title} — due ${formatDate(ticket.dueDate!)}`}
                   >
-                    <span className="text-[11px] text-white truncate">{ticket.title}</span>
+                    <span className="text-base text-white truncate">{ticket.title}</span>
                   </div>
                 </div>
               </div>
