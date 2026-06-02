@@ -29,5 +29,6 @@ router.post('/:id/watch', ticketsController.watch)
 router.delete('/:id/watch', ticketsController.watch)
 
 router.get('/:id/activity', ticketsController.getActivity)
+router.patch('/:id/client-complete', authorize('CLIENT'), ticketsController.clientComplete)
 
 export default router

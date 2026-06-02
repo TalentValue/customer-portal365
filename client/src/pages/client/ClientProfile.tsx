@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useMutation } from '@tanstack/react-query'
-import { Loader2, Pencil } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Loader2, Pencil, Bell } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { useAuthStore } from '@/store/authStore'
 import { authService } from '@/services/auth.service'
 import { useToast } from '@/hooks/useToast'
@@ -25,9 +26,17 @@ const pwSchema = z.object({
 }).refine((d) => d.newPassword === d.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword'] })
 type PwForm = z.infer<typeof pwSchema>
 
+const PREF_KEYS: { key: string; label: string }[] = [
+  { key: 'emailOnTicketUpdate', label: 'Ticket updates' },
+  { key: 'emailOnComment', label: 'New comments' },
+  { key: 'emailOnStatusChange', label: 'Status changes' },
+  { key: 'emailOnReminder', label: 'Reminders' },
+]
+
 export default function ClientProfile() {
   const { user, setUser } = useAuthStore()
   const { toast } = useToast()
+  const queryClient = useQueryClient()
   const [editingProfile, setEditingProfile] = useState(false)
 
   const profileForm = useForm<ProfileForm>({
@@ -55,6 +64,25 @@ export default function ClientProfile() {
 
   const { register: pwRegister, handleSubmit: pwHandleSubmit, formState: { errors: pwErrors }, reset: pwReset } =
     useForm<PwForm>({ resolver: zodResolver(pwSchema) })
+
+  const { data: prefs = {} } = useQuery({
+    queryKey: ['notification-preferences'],
+    queryFn: () => authService.getNotificationPreferences().then((r) => r.data),
+  })
+
+  const prefsMutation = useMutation({
+    mutationFn: (next: Record<string, boolean>) => authService.updateNotificationPreferences(next),
+    onSuccess: (res) => {
+      queryClient.setQueryData(['notification-preferences'], res.data)
+      toast({ title: 'Preferences saved' })
+    },
+    onError: () => toast({ variant: 'destructive', title: 'Failed to save preferences' }),
+  })
+
+  const togglePref = (key: string, value: boolean) => {
+    const next = { ...prefs, [key]: value }
+    prefsMutation.mutate(next)
+  }
 
   const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`
 
@@ -168,6 +196,30 @@ export default function ClientProfile() {
               Update Password
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Bell className="h-4 w-4 text-indigo-500" />
+            <div>
+              <CardTitle>Notification Preferences</CardTitle>
+              <CardDescription>Choose when to receive email notifications</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {PREF_KEYS.map(({ key, label }) => (
+            <div key={key} className="flex items-center justify-between py-1">
+              <Label className="font-normal text-slate-700">{label}</Label>
+              <Switch
+                checked={!!prefs[key]}
+                onCheckedChange={(v) => togglePref(key, v)}
+                disabled={prefsMutation.isPending}
+              />
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>

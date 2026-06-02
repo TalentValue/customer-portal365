@@ -36,6 +36,7 @@ import Templates from '@/pages/admin/Templates'
 // Client pages
 import ClientDashboard from '@/pages/client/ClientDashboard'
 import ClientTickets from '@/pages/client/ClientTickets'
+import ClientTicketDetail from '@/pages/client/ClientTicketDetail'
 import ClientProfile from '@/pages/client/ClientProfile'
 
 export default function App() {
@@ -83,7 +84,7 @@ export default function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<ClientDashboard />} />
           <Route path="tickets" element={<ClientTickets />} />
-          <Route path="tickets/:id" element={<TicketDetail />} />
+          <Route path="tickets/:id" element={<ClientTicketDetail />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="profile" element={<ClientProfile />} />
         </Route>

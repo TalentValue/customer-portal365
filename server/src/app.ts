@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import rateLimit from 'express-rate-limit'
+import path from 'path'
 import routes from './routes'
 import { errorHandler } from './middlewares/errorHandler'
 
@@ -24,6 +25,9 @@ app.use(rateLimit({
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+
+// Local file uploads (dev fallback when Supabase is not configured)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 // Health check
 app.get('/api/health', (_req, res) => {

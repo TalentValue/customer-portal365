@@ -111,4 +111,9 @@ export const ticketsController = {
     const data = await ticketsService.getActivity(req.params.id, Number(req.query.limit) || 50)
     res.json(data)
   }),
+
+  clientComplete: asyncHandler(async (req: AuthRequest, res: Response) => {
+    const data = await ticketsService.clientComplete(req.params.id, req.user!.userId, req.user!.companyId ?? null)
+    res.json(data)
+  }),
 }

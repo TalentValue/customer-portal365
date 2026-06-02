@@ -329,4 +329,34 @@ export const ticketsService = {
       include: { user: { select: { id: true, firstName: true, lastName: true } } },
     })
   },
+
+  async clientComplete(ticketId: string, userId: string, userCompanyId: string | null) {
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId }, include: { watchers: true } })
+    if (!ticket) throw new AppError('Ticket not found', 404)
+    if (ticket.companyId !== userCompanyId) throw new AppError('Ticket not found', 404)
+
+    const allowed = VALID_TRANSITIONS[ticket.status] ?? []
+    if (!allowed.includes('COMPLETED')) {
+      throw new AppError(`Cannot complete a ticket with status: ${ticket.status}`, 400)
+    }
+
+    const updated = await prisma.ticket.update({ where: { id: ticketId }, data: { status: 'COMPLETED' } })
+
+    const watcherIds = ticket.watchers.map((w) => w.userId).filter((id) => id !== userId)
+    if (watcherIds.length) {
+      await notificationsService.createBulk(watcherIds, {
+        type: 'TICKET_STATUS',
+        title: `Ticket completed: ${ticket.title}`,
+        body: 'Client marked this ticket as complete',
+        relatedId: ticketId,
+        relatedType: 'Ticket',
+      })
+    }
+
+    await prisma.activityLog.create({
+      data: { userId, action: 'STATUS_CHANGED_TO_COMPLETED', entityType: 'Ticket', entityId: ticketId },
+    })
+    notifyTicket(ticketId, 'ticket:updated', { id: ticketId, status: 'COMPLETED' })
+    return updated
+  },
 }

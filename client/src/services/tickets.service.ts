@@ -51,4 +51,6 @@ export const ticketsService = {
   getActivity: (id: string) => api.get(`/tickets/${id}/activity`),
 
   archive: (id: string) => api.patch(`/tickets/${id}/archive`),
+
+  clientComplete: (id: string) => api.patch(`/tickets/${id}/client-complete`),
 }

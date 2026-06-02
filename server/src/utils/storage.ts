@@ -1,6 +1,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { logger } from './logger'
 import path from 'path'
+import fs from 'fs'
 
 let _supabase: SupabaseClient | null = null
 function getSupabase(): SupabaseClient {
@@ -14,6 +15,17 @@ function getSupabase(): SupabaseClient {
 }
 
 const BUCKET = process.env.SUPABASE_BUCKET ?? 'clientportal365'
+const LOCAL_UPLOADS_DIR = path.join(__dirname, '../../uploads')
+
+function localUpload(buffer: Buffer, originalName: string, folder: string): string {
+  const dir = path.join(LOCAL_UPLOADS_DIR, folder)
+  fs.mkdirSync(dir, { recursive: true })
+  const ext = path.extname(originalName)
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`
+  fs.writeFileSync(path.join(dir, filename), buffer)
+  const serverUrl = process.env.SERVER_URL ?? `http://localhost:${process.env.SERVER_PORT ?? 3001}`
+  return `${serverUrl}/uploads/${folder}/${filename}`
+}
 
 export async function uploadFile(
   buffer: Buffer,
@@ -21,7 +33,11 @@ export async function uploadFile(
   mimeType: string,
   folder = 'uploads'
 ): Promise<string> {
-  if (!process.env.SUPABASE_URL) throw new Error('Supabase not configured. Set SUPABASE_URL and SUPABASE_SERVICE_KEY.')
+  if (!process.env.SUPABASE_URL) {
+    logger.warn('[storage] Supabase not configured — using local disk storage')
+    return localUpload(buffer, originalName, folder)
+  }
+
   const ext = path.extname(originalName)
   const key = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`
 
@@ -40,7 +56,14 @@ export async function uploadFile(
 }
 
 export async function deleteFile(publicUrl: string): Promise<void> {
-  if (!process.env.SUPABASE_URL) return
+  if (!process.env.SUPABASE_URL) {
+    try {
+      const url = new URL(publicUrl)
+      const filePath = path.join(LOCAL_UPLOADS_DIR, url.pathname.replace('/uploads/', ''))
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+    } catch { /* ignore */ }
+    return
+  }
   const url = new URL(publicUrl)
   const key = url.pathname.split(`/${BUCKET}/`)[1]
   if (!key) return
