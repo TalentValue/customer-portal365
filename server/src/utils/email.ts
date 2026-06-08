@@ -1,5 +1,7 @@
 import { Resend } from 'resend'
 import { logger } from './logger'
+import fs from 'fs'
+import path from 'path'
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -8,8 +10,33 @@ function getResend(): Resend {
 }
 
 const FROM = `${process.env.FROM_NAME ?? 'ClientPortal365'} <${process.env.FROM_EMAIL ?? 'noreply@clientportal365.com'}>`
+const DEV_MAIL_DIR = path.join(__dirname, '../../dev-emails')
+
+function saveDevEmail(to: string, subject: string, html: string): void {
+  fs.mkdirSync(DEV_MAIL_DIR, { recursive: true })
+  const filename = `${Date.now()}-${to.replace(/[^a-z0-9]/gi, '_')}.html`
+  const filepath = path.join(DEV_MAIL_DIR, filename)
+  fs.writeFileSync(filepath, `
+    <html><head><meta charset="utf-8">
+    <style>body{font-family:sans-serif;max-width:700px;margin:40px auto;padding:0 20px}
+    .meta{background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 16px;margin-bottom:24px;font-size:13px;color:#4338ca}
+    .meta strong{display:inline-block;width:60px}</style></head><body>
+    <div class="meta">
+      <div><strong>To:</strong> ${to}</div>
+      <div><strong>From:</strong> ${FROM}</div>
+      <div><strong>Subject:</strong> ${subject}</div>
+    </div>
+    ${html}
+    </body></html>
+  `)
+  logger.info(`[email] DEV — saved to file://${filepath.replace(/\\/g, '/')}`)
+}
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
+    saveDevEmail(to, subject, html)
+    return
+  }
   if (!process.env.RESEND_API_KEY) {
     logger.warn(`[email] RESEND_API_KEY not set — skipping email to ${to}: ${subject}`)
     return
@@ -19,6 +46,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
     logger.info(`[email] Sent to ${to}: ${subject}`)
   } catch (err) {
     logger.error(`[email] Failed to send to ${to}`, { err })
+    if (process.env.NODE_ENV !== 'production') saveDevEmail(to, subject, html)
   }
 }
 

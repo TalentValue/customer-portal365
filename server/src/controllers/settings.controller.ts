@@ -39,13 +39,18 @@ export const settingsController = {
   }),
 
   testEmail: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const currentUser = await prisma.user.findUnique({ where: { id: req.user!.userId }, select: { email: true } })
-    if (!currentUser) { res.status(404).json({ message: 'User not found' }); return }
+    const to = req.body.to as string | undefined
+    let recipient = to?.trim()
+    if (!recipient) {
+      const currentUser = await prisma.user.findUnique({ where: { id: req.user!.userId }, select: { email: true } })
+      if (!currentUser) { res.status(404).json({ message: 'User not found' }); return }
+      recipient = currentUser.email
+    }
     await sendEmail(
-      currentUser.email,
+      recipient,
       'ClientPortal365 — Test Email',
       '<p>This is a test email from ClientPortal365.</p><p>If you received this, your email configuration is working correctly.</p>',
     )
-    res.json({ message: `Test email sent to ${currentUser.email}` })
+    res.json({ message: `Test email sent to ${recipient}` })
   }),
 }
