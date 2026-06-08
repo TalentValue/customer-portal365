@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "FileChanged": [
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "A file was just changed in the ClientPortal365 codebase. Hook context: $ARGUMENTS\n\nExtract the file_path from the context above. Then:\n1. Read the file at that path\n2. Perform a thorough code review following the code-reviewer agent guidelines — check for correctness, security issues, TypeScript type safety, performance problems, architectural violations, and error handling gaps\n3. Skip the review if the file is auto-generated (Prisma client, dist/, migration SQL), a config file (.env, .json), or markdown\n4. Report findings with severity levels: CRITICAL / WARNING / INFO\n5. If no issues are found, confirm the code looks good\n\nBe concise and actionable. Reference specific line numbers.",
+            "model": "claude-haiku-4-5-20251001",
+            "statusMessage": "Reviewing changed file...",
+            "timeout": 120
+          },
+          {
+            "type": "agent",
+            "prompt": "A file was just changed in the ClientPortal365 codebase. Hook context: $ARGUMENTS\n\nYou are the database-review-coordinator. Read the agent definition at .claude/agents/database-review-coordinator.md for full instructions.\n\nSteps:\n1. Extract the file_path from the hook context above\n2. Read the changed file\n3. Determine if this file contains database operations (Prisma queries, service layer DB calls, schema changes, migration files, or cron jobs that query the DB)\n4. If NOT database-related: output '[DB Coordinator] No database operations detected. Skipping.' and stop\n5. If database-related: identify all affected tables, read the relevant table agent files from .claude/agents/db-<table>-agent.md, apply their review checklists, and produce a consolidated report\n6. Use severity levels: CRITICAL / WARNING / INFO\n7. Skip auto-generated files: node_modules/, dist/, prisma/migrations/*.sql\n\nBe concise. Reference specific line numbers.",
+            "model": "claude-haiku-4-5-20251001",
+            "statusMessage": "Running DB review...",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  }
+}
