@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
+import { sectionVariants, sectionContainer } from '@/utils/motionVariants'
 import {
   ArrowLeft, CheckCircle, Calendar, Clock, Paperclip,
   MessageSquare, Download, FileText, Image as ImageIcon, Trash2,
@@ -132,9 +133,14 @@ export default function ClientTicketDetail() {
   const canComplete = !NON_COMPLETABLE.has(ticket.status)
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <motion.div
+      variants={sectionContainer}
+      initial="hidden"
+      animate="show"
+      className="space-y-6 max-w-3xl"
+    >
       {/* Back + header */}
-      <div>
+      <motion.div variants={sectionVariants}>
         <Link
           to="/portal/tickets"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors mb-4"
@@ -179,25 +185,35 @@ export default function ClientTicketDetail() {
             </span>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Description */}
       {ticket.description && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Description</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RichTextDisplay html={ticket.description} />
-          </CardContent>
-        </Card>
+        <motion.div variants={sectionVariants}>
+          <Card className="glow-on-hover">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm shadow-indigo-200">
+                  <FileText className="h-3.5 w-3.5 text-white" />
+                </span>
+                Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RichTextDisplay html={ticket.description} />
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       {/* Comments */}
-      <Card>
+      <motion.div variants={sectionVariants}>
+      <Card className="glow-on-hover">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-indigo-500" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm shadow-indigo-200">
+              <MessageSquare className="h-3.5 w-3.5 text-white" />
+            </span>
             Comments {comments.length > 0 && <span className="text-slate-400 font-normal">({comments.length})</span>}
           </CardTitle>
         </CardHeader>
@@ -253,12 +269,16 @@ export default function ClientTicketDetail() {
           </div>
         </CardContent>
       </Card>
+      </motion.div>
 
       {/* Attachments */}
-      <Card>
+      <motion.div variants={sectionVariants}>
+      <Card className="glow-on-hover">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Paperclip className="h-4 w-4 text-indigo-500" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm shadow-indigo-200">
+              <Paperclip className="h-3.5 w-3.5 text-white" />
+            </span>
             Attachments {attachments.length > 0 && <span className="text-slate-400 font-normal">({attachments.length})</span>}
           </CardTitle>
         </CardHeader>
@@ -304,6 +324,7 @@ export default function ClientTicketDetail() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

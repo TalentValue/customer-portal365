@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import {
@@ -7,6 +6,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { PageSkeleton } from '@/components/common/LoadingSkeleton'
+import { StatCard } from '@/components/common/StatCard'
 import { formatRelative } from '@/utils/formatDate'
 import api from '@/services/api'
 import { DashboardStats } from '@/types'
@@ -17,30 +17,7 @@ import {
   ResponsiveContainer, Legend,
 } from 'recharts'
 
-/* ── Animated counter ── */
-function useCountUp(target: number, duration = 1200) {
-  const [val, setVal] = useState(0)
-  const frameRef = useRef<number>()
-  const startRef = useRef<number>()
-
-  useEffect(() => {
-    if (!target) return
-    const animate = (ts: number) => {
-      if (!startRef.current) startRef.current = ts
-      const elapsed = ts - startRef.current
-      const progress = Math.min(elapsed / duration, 1)
-      const ease = 1 - Math.pow(1 - progress, 3)
-      setVal(Math.round(ease * target))
-      if (progress < 1) frameRef.current = requestAnimationFrame(animate)
-    }
-    frameRef.current = requestAnimationFrame(animate)
-    return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current) }
-  }, [target, duration])
-
-  return val
-}
-
-/* ── Stat card ── */
+/* ── Stat card config ── */
 const STAT_CONFIG = [
   {
     key: 'totalCompanies' as keyof DashboardStats,
@@ -87,40 +64,6 @@ const STAT_CONFIG = [
     textColor: 'text-amber-600',
   },
 ]
-
-function StatCard({ config, value, index }: {
-  config: typeof STAT_CONFIG[0]
-  value: number
-  index: number
-}) {
-  const count = useCountUp(value)
-  const Icon = config.icon
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -3, transition: { duration: 0.2 } }}
-      className={`relative bg-white rounded-2xl border border-slate-100 shadow-sm ${config.glow} overflow-hidden transition-shadow duration-300 hover:shadow-lg`}
-    >
-      {/* Top accent bar */}
-      <div className={`h-1 w-full ${config.topBar}`} />
-      <div className="p-5">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <p className="text-xs font-medium text-slate-500 mb-1">{config.label}</p>
-            <div className={`text-3xl font-extrabold ${config.textColor}`}>{count}</div>
-          </div>
-          <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-md`}>
-            <Icon className="h-5 w-5 text-white" />
-          </div>
-        </div>
-        <p className="text-xs text-slate-400">{config.desc}</p>
-      </div>
-    </motion.div>
-  )
-}
 
 /* ── Custom chart tooltip ── */
 function ChartTooltip({ active, payload, label }: any) {
@@ -259,7 +202,13 @@ export default function Dashboard() {
         {STAT_CONFIG.map((config, i) => (
           <StatCard
             key={config.key}
-            config={config}
+            label={config.label}
+            desc={config.desc}
+            icon={config.icon}
+            gradient={config.gradient}
+            glow={config.glow}
+            topBar={config.topBar}
+            textColor={config.textColor}
             value={(data?.[config.key] as number) ?? 0}
             index={i}
           />

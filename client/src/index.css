@@ -87,3 +87,101 @@
 .animate-glow        { animation: glow-pulse 3s ease-in-out infinite; }
 .animate-shimmer     { animation: shimmer 3s linear infinite; background-size: 200% auto; }
 .animate-rotate-slow { animation: rotate-slow 20s linear infinite; }
+
+/* ── AI surface effects (used across internal app pages) ── */
+
+/* Animated gradient text — for headings/highlights */
+.text-gradient-ai {
+  background: linear-gradient(90deg, #6366f1, #a855f7, #06b6d4, #6366f1);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+/* Frosted glass surface */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Animated conic gradient border — wraps a card for an "AI active" look */
+@keyframes spin-border {
+  to { --border-angle: 360deg; }
+}
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.gradient-border-glow {
+  position: relative;
+  isolation: isolate;
+}
+.gradient-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--border-angle), #6366f1, #a855f7, #06b6d4, #6366f1);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-border 6s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+.gradient-border-glow:hover::before { opacity: 1; }
+
+/* Shimmering skeleton loader — replaces flat pulse with a moving sheen */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(110deg, #eef2ff 8%, #e0e7ff 18%, #eef2ff 33%);
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.6s linear infinite;
+}
+@keyframes shimmer-sweep {
+  to { background-position-x: -200%; }
+}
+
+/* Soft glow ring on hover — for interactive cards/tiles */
+.glow-on-hover {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.glow-on-hover:hover {
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15), 0 12px 32px -8px rgba(99, 102, 241, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Scanning highlight sweep — subtle "AI is working" cue */
+@keyframes scan-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.scan-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.scan-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.12), transparent);
+  animation: scan-sweep 2.5s ease-in-out infinite;
+}
+
+/* Reduced motion: tone down decorative animation for users who request it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora, .animate-float, .animate-glow, .animate-shimmer,
+  .animate-rotate-slow, .text-gradient-ai, .gradient-border-glow::before,
+  .skeleton-shimmer, .scan-sweep::after {
+    animation: none !important;
+  }
+}

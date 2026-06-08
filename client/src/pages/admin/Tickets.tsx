@@ -219,8 +219,8 @@ export default function Tickets() {
         <TicketTimeline tickets={data.data} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {data.data.map((ticket: Ticket) => (
-            <TicketCard key={ticket.id} ticket={ticket} />
+          {data.data.map((ticket: Ticket, i: number) => (
+            <TicketCard key={ticket.id} ticket={ticket} index={i} />
           ))}
         </div>
       )}
