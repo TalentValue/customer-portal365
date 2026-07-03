@@ -143,6 +143,7 @@ export default function Landing() {
   const navigate = useNavigate()
   const [tipIndex, setTipIndex] = useState(0)
   const [logIndex, setLogIndex] = useState(0)
+  const [scrolled, setScrolled] = useState(false)
 
   const TIPS = [
     'AI escalation engine fires every 30 min — zero SLA breaches',
@@ -167,22 +168,34 @@ export default function Landing() {
     return () => clearInterval(id)
   }, [])
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <div className="min-h-screen overflow-hidden bg-white text-slate-800">
+    <div className="min-h-screen bg-white text-slate-800">
 
       {/* ── Navbar ── */}
       <motion.nav
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-50 flex items-center justify-between border-b border-slate-100 bg-white px-6 py-4 shadow-sm md:px-14"
+        className={[
+          'fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-4 md:px-14',
+          'transition-all duration-300',
+          scrolled
+            ? 'border-b border-white/20 bg-white/80 shadow-sm shadow-slate-200/60 backdrop-blur-xl'
+            : 'border-b border-transparent bg-transparent',
+        ].join(' ')}
       >
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 shadow-md shadow-indigo-200/50">
             <Shield className="h-5 w-5 text-white" />
           </div>
-          <span className="text-lg font-extrabold tracking-tight text-slate-900">
-            Client<span className="text-indigo-600">Portal</span><span className="text-[#63B3FF]">365</span>
+          <span className={`text-lg font-extrabold tracking-tight transition-colors duration-300 ${scrolled ? 'text-slate-900' : 'text-white'}`}>
+            Client<span className="text-indigo-400">Portal</span><span className="text-[#63B3FF]">365</span>
           </span>
         </div>
 
@@ -191,22 +204,22 @@ export default function Landing() {
             { label: 'Features', href: '#features' },
             { label: 'How It Works', href: '#how-it-works' },
             { label: 'User Roles', href: '#roles' },
-            { label: 'Sign In', href: '/login' },
           ].map((item) => (
             <a key={item.label} href={item.href}
-              className="text-sm font-medium text-slate-500 transition-colors hover:text-indigo-600">
+              className={`text-sm font-medium transition-colors duration-300 ${scrolled ? 'text-slate-500 hover:text-indigo-600' : 'text-white/70 hover:text-white'}`}>
               {item.label}
             </a>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <Link to="/login" className="hidden text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 sm:block">
+          <Link to="/login"
+            className={`hidden text-sm font-medium transition-colors duration-300 sm:block ${scrolled ? 'text-slate-600 hover:text-indigo-600' : 'text-white/80 hover:text-white'}`}>
             Sign In
           </Link>
           <Link
             to="/login"
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200/60 transition-all hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-300/50"
+            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-900/40 transition-all hover:bg-indigo-500 hover:shadow-lg"
           >
             Get Started <ArrowRight className="h-3.5 w-3.5" />
           </Link>
@@ -214,7 +227,7 @@ export default function Landing() {
       </motion.nav>
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#020818] via-[#060d2e] to-[#0d1f5c]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#020818] via-[#060d2e] to-[#0d1f5c] pt-20">
 
         {/* ── AI Background: dot grid ── */}
         <div className="pointer-events-none absolute inset-0 opacity-[0.18]"
@@ -609,87 +622,152 @@ export default function Landing() {
       </section>
 
       {/* ── Automation section ── */}
-      <section className="mx-auto max-w-7xl px-6 py-24 lg:flex lg:items-center lg:gap-20">
-        <div className="flex-1 lg:max-w-[520px]">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600">
-              <Bot className="h-3 w-3" /> Always-On Automation
-            </div>
-            <h2 className="mb-5 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-5xl">
-              The Platform That Works <span className="text-indigo-600">While You Sleep</span>
-            </h2>
-            <p className="mb-8 text-base leading-relaxed text-slate-500">
-              Three background jobs run continuously to keep your SLAs on track, your clients
-              informed, and your ticket queue clean — without any manual intervention.
-            </p>
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#020818] via-[#060d2e] to-[#0d1f5c]">
 
-            <ul className="space-y-5">
-              {[
-                {
-                  icon: TrendingUp,
-                  title: 'SLA Escalation — Every 30 Minutes',
-                  desc: 'Scans all open tickets and automatically marks overdue ones, ensuring no SLA breach goes unnoticed.',
-                },
-                {
-                  icon: Bell,
-                  title: 'Reminder Emails — Every Hour',
-                  desc: 'Sends scheduled reminder emails for active reminders tied to tickets and companies via Resend SDK.',
-                },
-                {
-                  icon: Clock,
-                  title: 'Auto-Close — Daily at Midnight',
-                  desc: 'Closes tickets that have been inactive for N days (configurable per company, default 30 days).',
-                },
-              ].map(({ icon: Icon, title, desc }) => (
-                <li key={title} className="flex gap-4">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-indigo-100 bg-indigo-50">
-                    <Icon className="h-4 w-4 text-indigo-600" />
-                  </div>
-                  <div>
-                    <p className="mb-0.5 text-sm font-bold text-slate-800">{title}</p>
-                    <p className="text-sm leading-relaxed text-slate-500">{desc}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+        {/* AI background: dot grid */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.12]"
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(99,179,255,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+        {/* AI background: neural nodes (smaller set) */}
+        <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.15]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          {([
+            [80,60,  380,40],  [380,40,  620,90],  [620,90,  700,220],
+            [700,220,580,340], [580,340, 320,360], [320,360, 100,280],
+            [100,280,80,60],   [380,40,  320,180], [320,180, 580,340],
+            [620,90,  460,190],[460,190, 320,180],
+          ] as [number,number,number,number][]).map(([x1,y1,x2,y2], i) => (
+            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke="#63B3FF" strokeWidth="0.7" strokeOpacity="0.35" strokeDasharray="5 4"
+              style={{ animation: `dash-flow ${3.5 + i * 0.35}s ease-in-out infinite`, animationDelay: `${i * 0.28}s` }} />
+          ))}
+          {([
+            [80,60],[380,40],[620,90],[700,220],[580,340],[320,360],[100,280],[320,180],[460,190],
+          ] as [number,number][]).map(([cx, cy], i) => (
+            <g key={i}>
+              <circle cx={cx} cy={cy} r="10" fill="#63B3FF" fillOpacity="0.05" />
+              <circle cx={cx} cy={cy} r="3.5" fill="#63B3FF" fillOpacity="0.85"
+                style={{ animation: `neural-blink ${2.2 + i * 0.4}s ease-in-out infinite`, animationDelay: `${i * 0.22}s` }} />
+              <circle cx={cx} cy={cy} r="7" fill="none" stroke="#63B3FF" strokeWidth="0.7" strokeOpacity="0.3"
+                className="pulse-ring" style={{ animationDelay: `${i * 0.3}s` }} />
+            </g>
+          ))}
+        </svg>
+
+        {/* AI background: ambient orbs */}
+        <div className="pointer-events-none absolute -top-24 left-1/3 h-[380px] w-[380px] rounded-full blur-[100px]"
+          style={{ background: 'radial-gradient(circle, rgba(99,179,255,0.15) 0%, transparent 70%)' }} />
+        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[320px] w-[320px] rounded-full blur-[80px]"
+          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)' }} />
+
+        {/* AI background: scan beam */}
+        <div className="hero-v-scan" style={{ animationDelay: '3.5s' }} />
+
+        {/* AI background: particles */}
+        {[
+          { left: '8%',  bottom: '25%', size: 3, dur: '5.2s', delay: '0s' },
+          { left: '35%', bottom: '12%', size: 2, dur: '6.8s', delay: '1.4s' },
+          { left: '62%', bottom: '20%', size: 3, dur: '4.9s', delay: '0.7s' },
+          { left: '85%', bottom: '35%', size: 2, dur: '7.1s', delay: '2.1s' },
+        ].map((p, i) => (
+          <div key={i} className="ai-particle"
+            style={{ left: p.left, bottom: p.bottom, width: p.size, height: p.size, animationDuration: p.dur, animationDelay: p.delay }} />
+        ))}
+
+        <div className="relative mx-auto max-w-7xl px-6 py-24 lg:flex lg:items-center lg:gap-20">
+
+          {/* Left copy */}
+          <div className="flex-1 lg:max-w-[520px]">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#63B3FF]/30 bg-[#63B3FF]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#63B3FF]">
+                <Bot className="h-3 w-3" /> Always-On Automation
+              </div>
+
+              <h2 className="mb-5 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
+                The Platform That Works{' '}
+                <span className="relative inline-block">
+                  <span className="text-[#63B3FF]">While You Sleep</span>
+                  <motion.span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-[#63B3FF] to-purple-400"
+                    initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
+                    transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ transformOrigin: 'left' }} />
+                </span>
+              </h2>
+
+              <p className="mb-8 text-base leading-relaxed text-white/60">
+                Three background jobs run continuously to keep your SLAs on track, your clients
+                informed, and your ticket queue clean — without any manual intervention.
+              </p>
+
+              <ul className="space-y-5">
+                {[
+                  { icon: TrendingUp, title: 'SLA Escalation — Every 30 Minutes', desc: 'Scans all open tickets and automatically marks overdue ones, ensuring no SLA breach goes unnoticed.', color: 'text-[#63B3FF]', bg: 'bg-[#63B3FF]/10 border-[#63B3FF]/20' },
+                  { icon: Bell,       title: 'Reminder Emails — Every Hour',      desc: 'Sends scheduled ZeptoMail reminders for active tickets — timed perfectly to your company cadence.', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
+                  { icon: Clock,      title: 'Auto-Close — Daily at Midnight',     desc: 'Closes tickets inactive for N days (configurable per company, default 30 days) — queue stays clean.', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+                ].map(({ icon: Icon, title, desc, color, bg }, i) => (
+                  <motion.li key={title}
+                    initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.12 }}
+                    className="flex gap-4">
+                    <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${bg}`}>
+                      <Icon className={`h-4 w-4 ${color}`} />
+                    </div>
+                    <div>
+                      <p className={`mb-0.5 text-sm font-bold ${color}`}>{title}</p>
+                      <p className="text-sm leading-relaxed text-white/50">{desc}</p>
+                    </div>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+
+          {/* Right: glowing workflows panel */}
+          <motion.div
+            initial={{ opacity: 0, x: 32 }} whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="relative mt-16 flex-1 lg:mt-0"
+          >
+            <div className="gradient-border-always overflow-hidden rounded-2xl bg-[#060d26]/90 p-6 shadow-2xl backdrop-blur-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-widest text-white/40">Active System Processes</p>
+                <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" /> Running
+                </span>
+              </div>
+
+              <div className="space-y-2.5">
+                {ACTIVE_WORKFLOWS.map((w, i) => (
+                  <motion.div key={w.label}
+                    initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                    className="scan-sweep flex items-center gap-3 rounded-xl border border-white/8 bg-white/5 px-4 py-3.5">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 ${w.dot}`} />
+                      <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${w.dot}`} />
+                    </span>
+                    <span className="text-sm font-medium text-white/80">{w.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
+                <span className="flex items-center gap-1.5 text-xs text-white/30">
+                  <Workflow className="h-3 w-3" /> node-cron powered
+                </span>
+                <span className="text-xs font-semibold text-emerald-400">All systems nominal</span>
+              </div>
+            </div>
+
+            {/* Uptime badge */}
+            <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: 0.6 }}
+              className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+              <Zap className="h-4 w-4 text-[#63B3FF]" />
+              <span className="text-sm font-semibold text-white/70">Zero-downtime background execution</span>
+            </motion.div>
           </motion.div>
         </div>
-
-        {/* Right: dark workflows panel */}
-        <motion.div
-          initial={{ opacity: 0, x: 32 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mt-16 flex-1 lg:mt-0"
-        >
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#0a1030] p-6 shadow-2xl">
-            <p className="mb-5 text-xs font-bold uppercase tracking-widest text-white/40">Active System Processes</p>
-            <div className="space-y-2.5">
-              {ACTIVE_WORKFLOWS.map((w, i) => (
-                <motion.div
-                  key={w.label}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/5 px-4 py-3"
-                >
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${w.dot}`} />
-                  <span className="text-sm font-medium text-white/80">{w.label}</span>
-                </motion.div>
-              ))}
-            </div>
-            <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
-              <span className="text-xs text-white/30">node-cron powered</span>
-              <span className="text-xs font-semibold text-emerald-400">All systems nominal</span>
-            </div>
-          </div>
-        </motion.div>
       </section>
 
       {/* ── How it works ── */}
