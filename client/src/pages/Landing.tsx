@@ -419,10 +419,10 @@ export default function Landing() {
               {/* Stats grid */}
               <div className="mb-5 grid grid-cols-2 gap-3">
                 {[
-                  { val: 3, suffix: '', label: 'User Roles', icon: Users },
-                  { val: 18, suffix: '', label: 'DB Models', icon: GitBranch },
-                  { val: 98, suffix: '%', label: 'SLA Score', icon: TrendingUp },
-                  { val: 3, suffix: '', label: 'Cron Jobs', icon: Workflow },
+                  { val: 98,  suffix: '%', label: 'SLA Score',    icon: TrendingUp },
+                  { val: 100, suffix: '%', label: 'Real-time',    icon: Zap },
+                  { val: 99,  suffix: '%', label: 'Uptime',       icon: Shield },
+                  { val: 24,  suffix: '/7', label: 'Always-on',   icon: Workflow },
                 ].map((s, i) => (
                   <motion.div key={s.label}
                     initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
@@ -604,10 +604,10 @@ export default function Landing() {
         <div className="mx-auto max-w-5xl px-6">
           <div className="flex flex-wrap justify-around gap-10 text-center">
             {[
-              { value: 18, suffix: '', label: 'Prisma DB Models', sub: 'Full relational schema' },
-              { value: 3, suffix: '', label: 'User Roles', sub: 'SuperAdmin / Admin / Client' },
-              { value: 3, suffix: '', label: 'Scheduled Jobs', sub: 'Escalation · Reminders · Auto-close' },
-              { value: 100, suffix: '%', label: 'Real-time', sub: 'Socket.io powered updates' },
+              { value: 98,  suffix: '%', label: 'SLA Score',      sub: 'Auto-escalation enforced' },
+              { value: 3,   suffix: '',  label: 'Scheduled Jobs',  sub: 'Escalation · Reminders · Auto-close' },
+              { value: 100, suffix: '%', label: 'Real-time',       sub: 'Socket.io powered updates' },
+              { value: 24,  suffix: '/7', label: 'Always-on',       sub: 'ZeptoMail + cron jobs' },
             ].map((s) => (
               <div key={s.label}>
                 <div className="text-5xl font-extrabold text-indigo-600">

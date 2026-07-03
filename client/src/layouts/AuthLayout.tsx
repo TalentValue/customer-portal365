@@ -137,9 +137,9 @@ export function AuthLayout() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
             className="flex gap-8">
             {[
-              { value: '18', label: 'DB Models' },
-              { value: '3',  label: 'User Roles' },
-              { value: '3×', label: 'Cron Jobs' },
+              { value: '98%', label: 'SLA Score' },
+              { value: '24/7', label: 'Always-on' },
+              { value: '< 1s', label: 'Email delivery' },
             ].map((s) => (
               <div key={s.label}>
                 <div className="text-2xl font-extrabold text-[#63B3FF]">{s.value}</div>
