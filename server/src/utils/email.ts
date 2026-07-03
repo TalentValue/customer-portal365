@@ -4,13 +4,13 @@ import fs from 'fs'
 import path from 'path'
 
 const DEV_MAIL_DIR = path.join(__dirname, '../../dev-emails')
-const FROM_ADDRESS = process.env.FROM_EMAIL ?? 'noreply@clientportal365.com'
-const FROM_NAME = process.env.FROM_NAME ?? 'ClientPortal365'
+const FROM_ADDRESS = process.env.ZEPTOMAIL_FROM_ADDRESS ?? 'noreply@clientportal365.com'
+const FROM_NAME = process.env.ZEPTOMAIL_FROM_NAME ?? 'ClientPortal365'
 
 function getClient(): SendMailClient {
   return new SendMailClient({
     url: 'api.zeptomail.in/',
-    token: process.env.ZEPTOMAIL_TOKEN!,
+    token: process.env.ZEPTOMAIL_API_KEY!,
   })
 }
 
@@ -35,10 +35,10 @@ function saveDevEmail(to: string, subject: string, html: string): void {
 }
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  if (!process.env.ZEPTOMAIL_TOKEN) {
+  if (!process.env.ZEPTOMAIL_API_KEY) {
     saveDevEmail(to, subject, html)
     if (process.env.NODE_ENV === 'production') {
-      logger.warn(`[email] ZEPTOMAIL_TOKEN not set — skipping email to ${to}: ${subject}`)
+      logger.warn(`[email] ZEPTOMAIL_API_KEY not set — skipping email to ${to}: ${subject}`)
     }
     return
   }
