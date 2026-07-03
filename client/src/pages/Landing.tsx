@@ -110,7 +110,15 @@ const ACTIVE_WORKFLOWS = [
   { label: 'Reminder Email Job — every 1 hour', dot: 'bg-[#63B3FF]' },
   { label: 'Auto-Close Inactive Tickets — daily midnight', dot: 'bg-emerald-400' },
   { label: 'Socket.io Ticket Updates — live', dot: 'bg-emerald-400' },
-  { label: 'Email Queue via Resend SDK — processing', dot: 'bg-amber-400' },
+  { label: 'ZeptoMail Queue — transactional delivery', dot: 'bg-amber-400' },
+]
+
+const AI_LOG = [
+  { tag: 'SLA', msg: 'Escalation scan complete — 4 tickets within threshold', color: 'text-emerald-400' },
+  { tag: 'MAIL', msg: 'ZeptoMail: reminder dispatched → TechCorp client', color: 'text-[#63B3FF]' },
+  { tag: 'RT', msg: 'Socket.io: 3 sessions live — updates streaming', color: 'text-purple-400' },
+  { tag: 'AUTO', msg: 'Auto-close: scanned 12 tickets — 0 archived', color: 'text-amber-400' },
+  { tag: 'AUTH', msg: 'JWT refresh rotated — session extended 7d', color: 'text-emerald-400' },
 ]
 
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
@@ -134,12 +142,14 @@ export default function Landing() {
   const { isAuthenticated, user } = useAuthStore()
   const navigate = useNavigate()
   const [tipIndex, setTipIndex] = useState(0)
+  const [logIndex, setLogIndex] = useState(0)
 
   const TIPS = [
-    'Tickets auto-assign to the right team member instantly',
-    'SLA deadlines tracked automatically — no manual timers',
-    'Clients see live ticket updates without ever refreshing',
-    'Escalation job runs every 30 min to prevent SLA breaches',
+    'AI escalation engine fires every 30 min — zero SLA breaches',
+    'Socket.io streams live ticket updates to every client session',
+    'ZeptoMail dispatches transactional emails the instant events fire',
+    'Multi-tenant isolation: each company sees only its own data',
+    'PWA-ready — install on desktop or mobile, works offline too',
   ]
 
   useEffect(() => {
@@ -149,6 +159,11 @@ export default function Landing() {
 
   useEffect(() => {
     const id = setInterval(() => setTipIndex((p) => (p + 1) % TIPS.length), 3400)
+    return () => clearInterval(id)
+  }, [])
+
+  useEffect(() => {
+    const id = setInterval(() => setLogIndex((p) => (p + 1) % AI_LOG.length), 2800)
     return () => clearInterval(id)
   }, [])
 
@@ -199,187 +214,265 @@ export default function Landing() {
       </motion.nav>
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#060d2e] via-[#0f1e5e] to-[#1a3a9f]">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.35) 1px, transparent 1px)',
-            backgroundSize: '36px 36px',
-          }}
-        />
-        <div className="pointer-events-none absolute -top-32 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-500/20 blur-[100px]" />
-        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-indigo-600/20 blur-[100px]" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#020818] via-[#060d2e] to-[#0d1f5c]">
 
+        {/* ── AI Background: dot grid ── */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.18]"
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(99,179,255,0.5) 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
+
+        {/* ── AI Background: neural network SVG ── */}
+        <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.22]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="ng" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#63B3FF" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#63B3FF" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          {/* Connection lines */}
+          {([
+            [120,80,  320,60],  [320,60,  540,100], [540,100, 620,240],
+            [620,240, 500,370], [500,370, 280,390], [280,390, 100,320],
+            [100,320, 60,180],  [60,180,  120,80],
+            [320,60,  280,200], [280,200, 500,370],
+            [540,100, 440,210], [440,210, 280,200],
+            [280,200, 100,320], [440,210, 620,240],
+          ] as [number,number,number,number][]).map(([x1,y1,x2,y2], i) => (
+            <line key={i}
+              x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke="#63B3FF" strokeWidth="0.8" strokeOpacity="0.4"
+              strokeDasharray="6 4"
+              style={{ animation: `dash-flow ${3 + i * 0.4}s ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}
+            />
+          ))}
+          {/* Nodes */}
+          {[
+            [120,80],[320,60],[540,100],[620,240],[500,370],[280,390],[100,320],[60,180],[280,200],[440,210],
+          ].map(([cx, cy], i) => (
+            <g key={i}>
+              <circle cx={cx} cy={cy} r="14" fill="#63B3FF" fillOpacity="0.06" />
+              <circle cx={cx} cy={cy} r="4" fill="#63B3FF" fillOpacity="0.9"
+                style={{ animation: `neural-blink ${2 + i * 0.35}s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }} />
+              <circle cx={cx} cy={cy} r="8" fill="none" stroke="#63B3FF" strokeWidth="0.8" strokeOpacity="0.4"
+                className="pulse-ring" style={{ animationDelay: `${i * 0.25}s` }} />
+            </g>
+          ))}
+        </svg>
+
+        {/* ── AI Background: ambient orbs ── */}
+        <motion.div className="pointer-events-none absolute -top-32 left-1/4 h-[480px] w-[480px] rounded-full blur-[110px]"
+          style={{ background: 'radial-gradient(circle, rgba(99,179,255,0.18) 0%, transparent 70%)' }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.9, 0.5] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
+        <motion.div className="pointer-events-none absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full blur-[90px]"
+          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%)' }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.75, 0.4] }}
+          transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 3 }} />
+        <motion.div className="pointer-events-none absolute top-1/2 right-20 h-[280px] w-[280px] rounded-full blur-[80px]"
+          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.14) 0%, transparent 70%)' }}
+          animate={{ scale: [1, 1.25, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 5 }} />
+
+        {/* ── AI Background: vertical scan beam ── */}
+        <div className="hero-v-scan" />
+
+        {/* ── AI Background: floating particles ── */}
+        {[
+          { left: '12%', bottom: '20%', size: 3, dur: '5s', delay: '0s' },
+          { left: '28%', bottom: '15%', size: 2, dur: '6.5s', delay: '1.2s' },
+          { left: '55%', bottom: '25%', size: 4, dur: '4.8s', delay: '0.5s' },
+          { left: '72%', bottom: '18%', size: 2, dur: '7s',   delay: '2s' },
+          { left: '88%', bottom: '30%', size: 3, dur: '5.5s', delay: '1.8s' },
+          { left: '40%', bottom: '10%', size: 2, dur: '6s',   delay: '0.8s' },
+        ].map((p, i) => (
+          <div key={i} className="ai-particle"
+            style={{ left: p.left, bottom: p.bottom, width: p.size, height: p.size, animationDuration: p.dur, animationDelay: p.delay }} />
+        ))}
+
+        {/* ── Main content ── */}
         <div className="relative mx-auto max-w-7xl px-6 py-24 md:py-32 lg:flex lg:items-center lg:gap-16">
 
           {/* Left copy */}
           <div className="flex-1 lg:max-w-[580px]">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-white/80 backdrop-blur-sm"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#63B3FF]" />
-              Multi-tenant SaaS · Built by BusinessValue365
+
+            {/* Badge */}
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#63B3FF]/30 bg-[#63B3FF]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#63B3FF] backdrop-blur-sm">
+              <Bot className="h-3.5 w-3.5" />
+              AI-Powered Automation · BusinessValue365
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
+            {/* Headline */}
+            <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 text-5xl font-extrabold leading-[1.08] tracking-tight text-white md:text-6xl lg:text-[64px]"
-            >
-              The Client Portal Built for{' '}
-              <span className="text-[#63B3FF]">Service Teams</span>
+              className="mb-6 text-5xl font-extrabold leading-[1.06] tracking-tight text-white md:text-6xl lg:text-[64px]">
+              The Client Portal<br />
+              Built for{' '}
+              <span className="relative inline-block">
+                <span className="text-[#63B3FF]">Service Teams</span>
+                <motion.span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-[#63B3FF] to-purple-400"
+                  initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.9, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ transformOrigin: 'left' }} />
+              </span>
             </motion.h1>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.35 }}
-              className="mb-6 flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm"
-            >
+            {/* Rotating AI tip */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
+              className="mb-6 flex items-center gap-2.5 rounded-xl border border-[#63B3FF]/20 bg-[#63B3FF]/8 px-4 py-3 backdrop-blur-sm">
               <BrainCircuit className="h-4 w-4 shrink-0 text-[#63B3FF]" />
               <div className="h-5 overflow-hidden flex-1">
                 <AnimatePresence mode="wait">
-                  <motion.p
-                    key={tipIndex}
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -20, opacity: 0 }}
+                  <motion.p key={tipIndex}
+                    initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="text-sm font-medium text-white/85"
-                  >
+                    className="text-sm font-medium text-white/90">
                     {TIPS[tipIndex]}
                   </motion.p>
                 </AnimatePresence>
               </div>
+              <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#63B3FF]" />
             </motion.div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.38 }}
-              className="mb-10 text-base leading-relaxed text-white/65 md:text-lg"
-            >
-              Give every client a portal to submit tickets, track progress, and collaborate in real time.
-              Your team gets automated SLA tracking, smart routing, live dashboards, and
-              scheduled jobs that work 24/7 — so nothing ever slips through the cracks.
+            {/* Description */}
+            <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }}
+              className="mb-10 text-base leading-relaxed text-white/60 md:text-lg">
+              Onboard clients, manage tickets end-to-end, and let three AI-driven cron jobs handle
+              SLA escalation, automated reminders via <span className="text-white/80 font-medium">ZeptoMail</span>, and
+              auto-close — while <span className="text-white/80 font-medium">Socket.io</span> keeps every screen live.
+              Built for agencies that can't afford to miss a deadline.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.46 }}
-              className="flex flex-wrap gap-4"
-            >
+            {/* CTA buttons */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.46 }}
+              className="flex flex-wrap gap-4">
               <Link to="/login">
-                <motion.button
-                  whileHover={{ scale: 1.04, boxShadow: '0 16px 48px -8px rgba(99,179,255,0.45)' }}
-                  whileTap={{ scale: 0.97 }}
-                  className="beam-sweep flex items-center gap-2 rounded-xl bg-[#63B3FF] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#63B3FF]/30 transition-all hover:bg-[#4DA8FF]"
-                >
+                <motion.button whileHover={{ scale: 1.04, boxShadow: '0 16px 48px -8px rgba(99,179,255,0.5)' }} whileTap={{ scale: 0.97 }}
+                  className="beam-sweep flex items-center gap-2 rounded-xl bg-[#63B3FF] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#63B3FF]/30 transition-all hover:bg-[#4DA8FF]">
                   Enter Portal <ArrowRight className="h-4 w-4" />
                 </motion.button>
               </Link>
-              <motion.a
-                href="#features"
-                whileHover={{ scale: 1.02 }}
-                className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all hover:bg-white/20"
-              >
+              <motion.a href="#features" whileHover={{ scale: 1.02 }}
+                className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all hover:bg-white/15">
                 Explore Features <ChevronRight className="h-3.5 w-3.5" />
               </motion.a>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.62 }}
-              className="mt-8 flex flex-wrap gap-6 text-sm text-white/50"
-            >
+            {/* Trust badges */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.62 }}
+              className="mt-8 flex flex-wrap gap-5 text-xs text-white/40">
               {[
-                { icon: CheckCircle, text: 'JWT + Refresh Tokens' },
-                { icon: Lock, text: 'Role-Based Access Control' },
-                { icon: Globe, text: 'Multi-tenant Isolation' },
+                { icon: Zap, text: 'Socket.io Real-time' },
+                { icon: Lock, text: 'JWT + RBAC' },
+                { icon: Globe, text: 'Multi-tenant SaaS' },
+                { icon: Bot, text: 'ZeptoMail Transactional' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-1.5">
-                  <Icon className="h-3.5 w-3.5 text-[#63B3FF]" /> {text}
+                  <Icon className="h-3.5 w-3.5 text-[#63B3FF]/70" /> {text}
                 </div>
               ))}
             </motion.div>
           </div>
 
-          {/* Right: stats card + terminal */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
+          {/* Right: AI dashboard card */}
+          <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.42, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mt-16 flex-1 lg:mt-0"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              className="absolute -top-5 right-4 z-10 flex items-center gap-2 rounded-full border border-white/20 bg-[#0a1540]/90 px-4 py-2 shadow-xl backdrop-blur-sm"
-            >
-              <span className="h-2 w-2 animate-ping rounded-full bg-emerald-400" />
-              <span className="text-xs font-semibold text-white/90">Platform Live · All Systems Nominal</span>
+            className="relative mt-16 flex-1 lg:mt-0">
+
+            {/* Floating status pill */}
+            <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
+              className="absolute -top-5 right-4 z-10 flex items-center gap-2 rounded-full border border-emerald-500/30 bg-[#020818]/90 px-4 py-2 shadow-xl backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              <span className="text-xs font-semibold text-white/90">AI Engine Active · All Systems Nominal</span>
             </motion.div>
 
-            <div className="overflow-hidden rounded-2xl border border-white/15 bg-[#0a1540]/80 p-6 shadow-2xl backdrop-blur-sm">
+            {/* Main dashboard card */}
+            <div className="gradient-border-always overflow-hidden rounded-2xl bg-[#060d26]/90 p-6 shadow-2xl backdrop-blur-sm">
+
+              {/* Header */}
               <div className="mb-5 flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-widest text-white/50">Portal at a Glance</span>
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#63B3FF]/15">
+                    <BrainCircuit className="h-4 w-4 text-[#63B3FF]" />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-white/60">Portal at a Glance</span>
+                </div>
+                <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> LIVE
                 </span>
               </div>
 
+              {/* Stats grid */}
               <div className="mb-5 grid grid-cols-2 gap-3">
                 {[
-                  { val: 3, suffix: '', label: 'User Roles' },
-                  { val: 18, suffix: '', label: 'DB Models' },
-                  { val: 98, suffix: '%', label: 'SLA Score' },
-                  { val: 3, suffix: '', label: 'Cron Jobs' },
+                  { val: 3, suffix: '', label: 'User Roles', icon: Users },
+                  { val: 18, suffix: '', label: 'DB Models', icon: GitBranch },
+                  { val: 98, suffix: '%', label: 'SLA Score', icon: TrendingUp },
+                  { val: 3, suffix: '', label: 'Cron Jobs', icon: Workflow },
                 ].map((s, i) => (
-                  <motion.div
-                    key={s.label}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                  <motion.div key={s.label}
+                    initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.7 + i * 0.1 }}
-                    className="rounded-xl border border-white/10 bg-white/5 p-4"
-                  >
+                    className="group relative overflow-hidden rounded-xl border border-white/8 bg-white/4 p-4 hover:border-[#63B3FF]/30 transition-colors">
+                    <s.icon className="absolute right-3 top-3 h-4 w-4 text-white/10 group-hover:text-[#63B3FF]/20 transition-colors" />
                     <div className="text-3xl font-extrabold text-[#63B3FF]">
                       <AnimatedCounter target={s.val} suffix={s.suffix} />
                     </div>
-                    <div className="mt-0.5 text-xs font-medium uppercase tracking-wide text-white/45">{s.label}</div>
+                    <div className="mt-0.5 text-xs font-medium uppercase tracking-wide text-white/40">{s.label}</div>
                   </motion.div>
                 ))}
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-[#060d26] p-4">
-                <div className="mb-3 flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                  <span className="ml-2 text-xs text-white/30">system.log</span>
+              {/* AI activity log */}
+              <div className="rounded-xl border border-white/10 bg-[#020818] p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+                    <span className="ml-2 text-xs text-white/25">ai-engine.log</span>
+                  </div>
+                  <span className="text-xs text-[#63B3FF]/60">live feed</span>
                 </div>
-                <div className="space-y-1.5 font-mono text-xs">
-                  <p className="text-white/40">$ sla-escalation <span className="text-[#63B3FF]">every 30min</span> <span className="text-emerald-400">✓ active</span><span className="animate-pulse text-white">▌</span></p>
-                  <p className="text-white/30">$ reminder-job <span className="text-emerald-400">every 1h running</span></p>
-                  <p className="text-white/30">$ auto-close <span className="text-amber-400">midnight scheduled</span></p>
+                <div className="space-y-1.5 font-mono text-xs min-h-[72px]">
+                  {/* Static lines */}
+                  <p className="text-white/35">
+                    <span className="text-white/20">$</span> sla-escalation
+                    <span className="text-[#63B3FF]"> --interval 30m</span>
+                    <span className="text-emerald-400"> ✓</span>
+                  </p>
+                  <p className="text-white/25">
+                    <span className="text-white/20">$</span> reminder-job
+                    <span className="text-white/30"> --freq 1h</span>
+                    <span className="text-[#63B3FF]"> running</span>
+                  </p>
+                  {/* Rotating live log */}
+                  <div className="h-[18px] overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.p key={logIndex}
+                        initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="text-white/50">
+                        <span className="text-white/20">›</span>{' '}
+                        <span className={`${AI_LOG[logIndex].color} font-semibold`}>[{AI_LOG[logIndex].tag}]</span>{' '}
+                        {AI_LOG[logIndex].msg}
+                        <span className="caret-blink text-[#63B3FF]">▌</span>
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-              className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm"
-            >
+            {/* Bottom brand pill */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
+              className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
               <Shield className="h-4 w-4 text-[#63B3FF]" />
-              <span className="text-sm font-semibold text-white/80">A BusinessValue365 Product</span>
+              <span className="text-sm font-semibold text-white/70">A BusinessValue365 Product</span>
+              <span className="ml-auto flex items-center gap-1 text-xs text-white/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> PWA Ready
+              </span>
             </motion.div>
           </motion.div>
         </div>

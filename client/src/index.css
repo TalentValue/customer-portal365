@@ -227,11 +227,72 @@
   pointer-events: none;
 }
 
+/* ── AI Hero effects ── */
+
+/* Vertical scan beam sweeping across hero */
+@keyframes v-scan {
+  0%   { left: -4%; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 0.7; }
+  100% { left: 106%; opacity: 0; }
+}
+.hero-v-scan {
+  position: absolute;
+  top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, transparent 0%, rgba(99,179,255,0.8) 40%, rgba(99,179,255,0.8) 60%, transparent 100%);
+  box-shadow: 0 0 12px 3px rgba(99,179,255,0.4);
+  animation: v-scan 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Floating AI particles */
+@keyframes ai-particle {
+  0%   { opacity: 0; transform: translateY(0px) scale(0.4); }
+  15%  { opacity: 0.8; }
+  85%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-70px) scale(1.1); }
+}
+.ai-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,179,255,0.9), transparent);
+  pointer-events: none;
+  animation: ai-particle linear infinite;
+}
+
+/* Pulsing ring around AI nodes */
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+
+/* Neural node blink */
+@keyframes neural-blink {
+  0%, 90%, 100% { opacity: 0.25; }
+  45%           { opacity: 1; }
+}
+
+/* Data-flow line along SVG path */
+@keyframes dash-flow {
+  0%   { stroke-dashoffset: 200; opacity: 0.15; }
+  40%  { opacity: 0.7; }
+  100% { stroke-dashoffset: 0; opacity: 0.15; }
+}
+
+/* Typewriter cursor blink */
+@keyframes caret {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.caret-blink { animation: caret 1s step-end infinite; }
+
 /* Reduced motion: tone down decorative animation for users who request it */
 @media (prefers-reduced-motion: reduce) {
   .animate-aurora, .animate-float, .animate-glow, .animate-shimmer,
   .animate-rotate-slow, .text-gradient-ai, .gradient-border-glow::before,
-  .skeleton-shimmer, .scan-sweep::after, .animate-marquee, .beam-sweep::after {
+  .skeleton-shimmer, .scan-sweep::after, .animate-marquee, .beam-sweep::after,
+  .hero-v-scan, .ai-particle, .pulse-ring {
     animation: none !important;
   }
 }
