@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import {
   Building2, Ticket, AlertCircle, Clock, TrendingUp,
   Plus, UserPlus, BarChart3, ArrowUpRight, Activity,
-  Sparkles,
+  Sparkles, Crown, UserCog,
 } from 'lucide-react'
 import { PageSkeleton } from '@/components/common/LoadingSkeleton'
 import { StatCard } from '@/components/common/StatCard'
@@ -115,6 +115,50 @@ function QuickAction({ icon: Icon, label, desc, gradient, onClick, index }: {
   )
 }
 
+function SuperAdminBanner() {
+  const { data: staff = [] } = useQuery<{ id: string; role: string }[]>({
+    queryKey: ['users'],
+    queryFn: () => api.get('/users').then((r) => r.data),
+  })
+  const superAdmins = staff.filter((u) => u.role === 'SUPER_ADMIN').length
+  const admins = staff.filter((u) => u.role === 'ADMIN').length
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-purple-200 bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-5">
+      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.07]">
+        <Crown className="h-28 w-28 text-purple-600" />
+      </div>
+      <div className="flex items-center gap-3 mb-3">
+        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-md">
+          <Crown className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <p className="font-bold text-sm text-purple-800">Platform Overview</p>
+          <p className="text-xs text-purple-500">Super Admin view — all data across tenants</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Super Admins', value: superAdmins, icon: Crown, color: 'text-purple-600 bg-purple-100' },
+          { label: 'Admins', value: admins, icon: UserCog, color: 'text-indigo-600 bg-indigo-100' },
+          { label: 'Staff Total', value: staff.length, icon: UserCog, color: 'text-blue-600 bg-blue-100' },
+          { label: 'Cron Jobs', value: 3, icon: Activity, color: 'text-emerald-600 bg-emerald-100' },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="rounded-xl bg-white/60 border border-white px-3 py-2.5 flex items-center gap-2.5 backdrop-blur-sm">
+            <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 ${color}`}>
+              <Icon className="h-3.5 w-3.5" />
+            </div>
+            <div>
+              <p className="text-lg font-bold text-slate-800 leading-none">{value}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const SAMPLE_CHART = Array.from({ length: 7 }, (_, i) => ({
   day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i],
   tickets: Math.floor(Math.random() * 20) + 5,
@@ -196,6 +240,13 @@ export default function Dashboard() {
           </div>
         </div>
       </motion.div>
+
+      {/* ── SuperAdmin platform overview ── */}
+      {user?.role === 'SUPER_ADMIN' && (
+        <motion.div variants={rowVariants}>
+          <SuperAdminBanner />
+        </motion.div>
+      )}
 
       {/* ── Stat cards ── */}
       <motion.div variants={rowVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -32,6 +32,7 @@ import Settings from '@/pages/admin/Settings'
 import AuditLogs from '@/pages/admin/AuditLogs'
 import Team from '@/pages/admin/Team'
 import Templates from '@/pages/admin/Templates'
+import Users from '@/pages/admin/Users'
 
 // Client pages
 import ClientDashboard from '@/pages/client/ClientDashboard'
@@ -77,6 +78,7 @@ export default function App() {
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="team" element={<Team />} />
           <Route path="templates" element={<Templates />} />
+          <Route path="users" element={<Users />} />
         </Route>
 
         {/* Client portal routes */}

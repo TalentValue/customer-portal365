@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Building2, Users, Ticket, BarChart3,
-  Bell, Settings, FileText, ChevronLeft, LogOut, Shield, Users2, Copy,
+  Bell, Settings, FileText, ChevronLeft, LogOut, Shield, Users2, Copy, UserCog,
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useUIStore } from '@/store/uiStore'
@@ -18,6 +18,7 @@ const ADMIN_NAV = [
   { to: '/admin/tickets', icon: Ticket, label: 'Tickets' },
   { to: '/admin/templates', icon: Copy, label: 'Templates' },
   { to: '/admin/team', icon: Users2, label: 'Team' },
+  { to: '/admin/users', icon: UserCog, label: 'Staff Users' },
   { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
   { to: '/admin/audit-logs', icon: FileText, label: 'Audit Logs' },
