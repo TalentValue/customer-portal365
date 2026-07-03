@@ -10,7 +10,14 @@ export const analyticsController = {
   }),
 
   analytics: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const data = await analyticsService.getAnalytics()
+    const { startDate, endDate, companyId } = req.query as Record<string, string>
+    const data = await analyticsService.getAnalytics({
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
+      companyId: companyId || undefined,
+      userId: req.user!.userId,
+      role: req.user!.role,
+    })
     res.json(data)
   }),
 }

@@ -2,6 +2,14 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+interface AnalyticsOptions {
+  startDate?: Date
+  endDate?: Date
+  companyId?: string
+  userId: string
+  role: string
+}
+
 export const analyticsService = {
   async dashboard(userId: string, role: string) {
     const companyWhere = role === 'ADMIN' ? { accountManagerId: userId } : {}
@@ -32,10 +40,21 @@ export const analyticsService = {
     return { totalCompanies, activeTickets, overdueTickets, pendingApprovals, completionRate, recentActivity }
   },
 
-  async getAnalytics() {
+  async getAnalytics({ startDate, endDate, companyId, userId, role }: AnalyticsOptions) {
     const now = new Date()
 
-    // Build month boundaries for last 6 months
+    const baseWhere: any = {}
+    if (companyId) {
+      baseWhere.companyId = companyId
+    } else if (role === 'ADMIN') {
+      baseWhere.company = { accountManagerId: userId }
+    }
+    if (startDate || endDate) {
+      baseWhere.createdAt = {}
+      if (startDate) baseWhere.createdAt.gte = startDate
+      if (endDate) baseWhere.createdAt.lte = endDate
+    }
+
     const months = Array.from({ length: 6 }, (_, i) => {
       const start = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
       const end = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 1)
@@ -43,10 +62,10 @@ export const analyticsService = {
     })
 
     const [ticketsByStatus, ...monthlyPairs] = await Promise.all([
-      prisma.ticket.groupBy({ by: ['status'], _count: { id: true } }),
+      prisma.ticket.groupBy({ by: ['status'], where: baseWhere, _count: { id: true } }),
       ...months.flatMap(({ start, end }) => [
-        prisma.ticket.count({ where: { createdAt: { gte: start, lt: end } } }),
-        prisma.ticket.count({ where: { status: { in: ['COMPLETED', 'CLOSED'] }, updatedAt: { gte: start, lt: end } } }),
+        prisma.ticket.count({ where: { ...baseWhere, createdAt: { gte: start, lt: end } } }),
+        prisma.ticket.count({ where: { ...baseWhere, status: { in: ['COMPLETED', 'CLOSED'] }, updatedAt: { gte: start, lt: end } } }),
       ]),
     ])
 
@@ -56,12 +75,12 @@ export const analyticsService = {
       resolved: monthlyPairs[i * 2 + 1] as number,
     }))
 
-    const totalTickets = await prisma.ticket.count()
-    const completedTickets = await prisma.ticket.count({ where: { status: { in: ['COMPLETED', 'CLOSED'] } } })
-    const overdueTickets = await prisma.ticket.count({ where: { status: 'OVERDUE' } })
-    const openTickets = await prisma.ticket.count({
-      where: { status: { in: ['OPEN', 'IN_PROGRESS', 'WAITING_FOR_CLIENT', 'SUBMITTED'] } },
-    })
+    const [totalTickets, completedTickets, overdueTickets, openTickets] = await Promise.all([
+      prisma.ticket.count({ where: baseWhere }),
+      prisma.ticket.count({ where: { ...baseWhere, status: { in: ['COMPLETED', 'CLOSED'] } } }),
+      prisma.ticket.count({ where: { ...baseWhere, status: 'OVERDUE' } }),
+      prisma.ticket.count({ where: { ...baseWhere, status: { in: ['OPEN', 'IN_PROGRESS', 'WAITING_FOR_CLIENT', 'SUBMITTED'] } } }),
+    ])
 
     return {
       ticketsByStatus: ticketsByStatus.map((r) => ({

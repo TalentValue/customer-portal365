@@ -1,20 +1,47 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import { PageSkeleton } from '@/components/common/LoadingSkeleton'
+import { X, Ticket, CheckCircle2, AlertTriangle, TrendingUp } from 'lucide-react'
 import api from '@/services/api'
+import { useAuthStore } from '@/store/authStore'
 import {
   BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
-import { Ticket, CheckCircle2, AlertTriangle, TrendingUp } from 'lucide-react'
 
-const COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#84cc16']
+const COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6']
+
+interface Company { id: string; name: string }
 
 export default function Analytics() {
+  const { user } = useAuthStore()
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN'
+
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [companyId, setCompanyId] = useState('all')
+
+  const params: Record<string, string> = {}
+  if (startDate) params.startDate = startDate
+  if (endDate) params.endDate = endDate
+  if (companyId && companyId !== 'all') params.companyId = companyId
+
   const { data, isLoading } = useQuery({
-    queryKey: ['analytics'],
-    queryFn: () => api.get('/analytics').then((r) => r.data),
+    queryKey: ['analytics', startDate, endDate, companyId],
+    queryFn: () => api.get('/analytics', { params }).then((r) => r.data),
   })
+
+  const { data: companies = [] } = useQuery<Company[]>({
+    queryKey: ['companies-simple'],
+    queryFn: () => api.get('/companies').then((r) => r.data?.data ?? r.data),
+    enabled: isSuperAdmin,
+  })
+
+  const hasFilters = startDate || endDate || (companyId && companyId !== 'all')
 
   if (isLoading) return <PageSkeleton />
 
@@ -27,6 +54,49 @@ export default function Analytics() {
       <div>
         <h1 className="text-2xl font-bold">Analytics</h1>
         <p className="text-muted-foreground text-sm">Performance metrics and insights</p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-[150px]"
+          />
+          <span className="text-muted-foreground text-sm">to</span>
+          <Input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-[150px]"
+          />
+        </div>
+        {isSuperAdmin && (
+          <Select value={companyId} onValueChange={setCompanyId}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All companies" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All companies</SelectItem>
+              {companies.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        {hasFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1 text-muted-foreground"
+            onClick={() => { setStartDate(''); setEndDate(''); setCompanyId('all') }}
+          >
+            <X className="h-3.5 w-3.5" />
+            Clear
+          </Button>
+        )}
       </div>
 
       {/* Summary stats */}

@@ -1,16 +1,18 @@
-import { Resend } from 'resend'
+import { SendMailClient } from 'zeptomail'
 import { logger } from './logger'
 import fs from 'fs'
 import path from 'path'
 
-let _resend: Resend | null = null
-function getResend(): Resend {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY!)
-  return _resend
-}
-
-const FROM = `${process.env.FROM_NAME ?? 'ClientPortal365'} <${process.env.FROM_EMAIL ?? 'noreply@clientportal365.com'}>`
 const DEV_MAIL_DIR = path.join(__dirname, '../../dev-emails')
+const FROM_ADDRESS = process.env.FROM_EMAIL ?? 'noreply@clientportal365.com'
+const FROM_NAME = process.env.FROM_NAME ?? 'ClientPortal365'
+
+function getClient(): SendMailClient {
+  return new SendMailClient({
+    url: 'api.zeptomail.in/',
+    token: process.env.ZEPTOMAIL_TOKEN!,
+  })
+}
 
 function saveDevEmail(to: string, subject: string, html: string): void {
   fs.mkdirSync(DEV_MAIL_DIR, { recursive: true })
@@ -23,7 +25,7 @@ function saveDevEmail(to: string, subject: string, html: string): void {
     .meta strong{display:inline-block;width:60px}</style></head><body>
     <div class="meta">
       <div><strong>To:</strong> ${to}</div>
-      <div><strong>From:</strong> ${FROM}</div>
+      <div><strong>From:</strong> ${FROM_NAME} &lt;${FROM_ADDRESS}&gt;</div>
       <div><strong>Subject:</strong> ${subject}</div>
     </div>
     ${html}
@@ -33,20 +35,24 @@ function saveDevEmail(to: string, subject: string, html: string): void {
 }
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
+  if (!process.env.ZEPTOMAIL_TOKEN) {
     saveDevEmail(to, subject, html)
-    return
-  }
-  if (!process.env.RESEND_API_KEY) {
-    logger.warn(`[email] RESEND_API_KEY not set — skipping email to ${to}: ${subject}`)
+    if (process.env.NODE_ENV === 'production') {
+      logger.warn(`[email] ZEPTOMAIL_TOKEN not set — skipping email to ${to}: ${subject}`)
+    }
     return
   }
   try {
-    await getResend().emails.send({ from: FROM, to, subject, html })
+    await getClient().sendMail({
+      from: { address: FROM_ADDRESS, name: FROM_NAME },
+      to: [{ email_address: { address: to, name: to } }],
+      subject,
+      htmlbody: html,
+    })
     logger.info(`[email] Sent to ${to}: ${subject}`)
   } catch (err) {
     logger.error(`[email] Failed to send to ${to}`, { err })
-    if (process.env.NODE_ENV !== 'production') saveDevEmail(to, subject, html)
+    saveDevEmail(to, subject, html)
   }
 }
 

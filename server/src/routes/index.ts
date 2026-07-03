@@ -9,6 +9,7 @@ import auditRoutes from './audit.routes'
 import teamsRoutes from './teams.routes'
 import settingsRoutes from './settings.routes'
 import templatesRoutes from './templates.routes'
+import remindersRoutes from './reminders.routes'
 import { authenticate } from '../middlewares/authenticate'
 import { authorize } from '../middlewares/authorize'
 import { usersController } from '../controllers/users.controller'
@@ -25,6 +26,7 @@ router.use('/audit-logs', auditRoutes)
 router.use('/teams', teamsRoutes)
 router.use('/settings', settingsRoutes)
 router.use('/templates', templatesRoutes)
+router.use('/reminders', remindersRoutes)
 
 // Users list — used by assignee picker and team member selection
 router.get('/users', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), usersController.list)
