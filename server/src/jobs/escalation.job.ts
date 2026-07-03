@@ -10,37 +10,38 @@ export function startEscalationJob() {
   // Run every 30 minutes
   cron.schedule('*/30 * * * *', async () => {
     logger.info('[job] Running escalation job')
-    const now = new Date()
+    try {
+      const now = new Date()
 
-    const overdue = await prisma.ticket.findMany({
-      where: {
-        status: { notIn: ['COMPLETED', 'CLOSED', 'OVERDUE'] },
-        OR: [
-          { slaDeadline: { lt: now } },
-          { dueDate: { lt: now } },
-        ],
-      },
-      include: { company: { include: { accountManager: true } } },
-    })
+      const overdue = await prisma.ticket.findMany({
+        where: {
+          status: { notIn: ['COMPLETED', 'CLOSED', 'OVERDUE'] },
+          OR: [
+            { slaDeadline: { lt: now } },
+            { dueDate: { lt: now } },
+          ],
+        },
+        include: { company: { include: { accountManager: true } } },
+      })
 
-    for (const ticket of overdue) {
-      // escalateToOverdue handles the Prisma update, watcher notifications,
-      // ActivityLog entry, and socket emit in one place
-      await ticketsService.escalateToOverdue(ticket.id)
+      for (const ticket of overdue) {
+        await ticketsService.escalateToOverdue(ticket.id)
 
-      // Account manager gets a separate targeted notification
-      if (ticket.company?.accountManager) {
-        const deadline = ticket.slaDeadline ?? ticket.dueDate
-        await notificationsService.create(ticket.company.accountManager.id, {
-          type: 'TICKET_OVERDUE',
-          title: `Ticket overdue: ${ticket.title}`,
-          body: `Deadline was ${deadline?.toISOString() ?? 'not set'}`,
-          relatedId: ticket.id,
-          relatedType: 'Ticket',
-        })
+        if (ticket.company?.accountManager) {
+          const deadline = ticket.slaDeadline ?? ticket.dueDate
+          await notificationsService.create(ticket.company.accountManager.id, {
+            type: 'TICKET_OVERDUE',
+            title: `Ticket overdue: ${ticket.title}`,
+            body: `Deadline was ${deadline?.toISOString() ?? 'not set'}`,
+            relatedId: ticket.id,
+            relatedType: 'Ticket',
+          })
+        }
+
+        logger.info(`[job] Escalated ticket ${ticket.id} to OVERDUE`)
       }
-
-      logger.info(`[job] Escalated ticket ${ticket.id} to OVERDUE`)
+    } catch (err) {
+      logger.error('[job] Escalation job failed:', err)
     }
   })
 }

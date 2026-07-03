@@ -10,6 +10,7 @@ export function startRemindersJob() {
   // Run every hour
   cron.schedule('0 * * * *', async () => {
     logger.info('[job] Running reminders job')
+    try {
     const now = new Date()
 
     const reminders = await prisma.reminder.findMany({
@@ -48,6 +49,9 @@ export function startRemindersJob() {
           logger.info(`[job] Reminder sent for ticket ${reminder.ticketId}`)
         }
       }
+    }
+    } catch (err) {
+      logger.error('[job] Reminders job failed:', err)
     }
   })
 }

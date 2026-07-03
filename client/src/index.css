@@ -138,6 +138,28 @@
 }
 .gradient-border-glow:hover::before { opacity: 1; }
 
+/* Always-on animated gradient border — for dark-theme cards */
+.gradient-border-always {
+  position: relative;
+  isolation: isolate;
+}
+.gradient-border-always::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--border-angle), #6366f1, #a855f7, #06b6d4, #6366f1);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-border 8s linear infinite;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+.gradient-border-always:hover::before { opacity: 1; }
+
 /* Shimmering skeleton loader — replaces flat pulse with a moving sheen */
 .skeleton-shimmer {
   position: relative;
@@ -177,11 +199,39 @@
   animation: scan-sweep 2.5s ease-in-out infinite;
 }
 
+/* Scrolling marquee ticker */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 32s linear infinite; }
+
+/* Light beam sweep — "AI is working" shine on buttons/cards */
+@keyframes beam-x {
+  0%   { transform: translateX(-160%) skewX(-15deg); opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateX(260%) skewX(-15deg); opacity: 0; }
+}
+.beam-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.beam-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  animation: beam-x 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
 /* Reduced motion: tone down decorative animation for users who request it */
 @media (prefers-reduced-motion: reduce) {
   .animate-aurora, .animate-float, .animate-glow, .animate-shimmer,
   .animate-rotate-slow, .text-gradient-ai, .gradient-border-glow::before,
-  .skeleton-shimmer, .scan-sweep::after {
+  .skeleton-shimmer, .scan-sweep::after, .animate-marquee, .beam-sweep::after {
     animation: none !important;
   }
 }
