@@ -670,27 +670,16 @@ export default function Landing() {
 
         <div className="relative mx-auto max-w-3xl px-6 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur-sm">
-            <Sparkles className="h-3 w-3 text-[#63B3FF]" /> Sign in with seed credentials
+            <Sparkles className="h-3 w-3 text-[#63B3FF]" /> Multi-tenant SaaS · Built by BusinessValue365
           </div>
           <h2 className="mb-4 text-4xl font-extrabold text-white md:text-5xl">
             Ready to Experience<br />
             <span className="text-[#63B3FF]">ClientPortal365?</span>
           </h2>
-          <p className="mb-4 text-base text-white/60">
-            Use the seeded demo accounts to explore the full platform — from the SuperAdmin dashboard
-            to the client self-service portal.
+          <p className="mb-10 text-base text-white/60">
+            A unified workspace for client onboarding, ticket management, and real-time collaboration —
+            built for modern service teams.
           </p>
-          <div className="mb-10 flex flex-wrap justify-center gap-3 text-sm text-white/50">
-            <span className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 font-mono">
-              superadmin@businessvalue365.com
-            </span>
-            <span className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 font-mono">
-              admin@businessvalue365.com
-            </span>
-            <span className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 font-mono">
-              Password: Admin123!
-            </span>
-          </div>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/login">
               <motion.button
@@ -706,7 +695,7 @@ export default function Landing() {
                 whileHover={{ scale: 1.03 }}
                 className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-8 py-4 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all hover:bg-white/20"
               >
-                View as Client
+                Client Portal
               </motion.button>
             </Link>
           </div>
