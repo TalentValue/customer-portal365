@@ -27,14 +27,22 @@ jobs:
       - name: Typecheck server
         run: npx tsc --noEmit -p server/tsconfig.json
 
-  docker-build:
-    name: Docker build
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build server image
-        run: docker build -f server/Dockerfile -t clientportal365-server .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Build client image
-        run: docker build -f client/Dockerfile -t clientportal365-client .
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build client
+        run: npm run build --workspace=client
+
+      - name: Build server
+        run: npm run build --workspace=server

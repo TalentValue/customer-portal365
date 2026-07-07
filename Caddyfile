@@ -1,8 +1,11 @@
 {$DOMAIN} {
-    # API and WebSocket — forward to Node server
-    reverse_proxy /api/* server:3001
-    reverse_proxy /socket.io/* server:3001
+    # API and WebSocket — forward to the PM2-managed Node server
+    reverse_proxy /api/* localhost:3001
+    reverse_proxy /socket.io/* localhost:3001
 
-    # Everything else — serve from the React nginx container
-    reverse_proxy * client:80
+    # Everything else — serve the built React app
+    root * /app/client/dist
+    encode gzip
+    file_server
+    try_files {path} /index.html
 }
